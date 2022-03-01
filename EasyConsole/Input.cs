@@ -55,7 +55,12 @@ namespace EasyConsole
 
             TEnum choice = default(TEnum);
             foreach (var value in Enum.GetValues(type))
-                menu.Add(Enum.GetName(type, value), () => { choice = (TEnum)value; });
+                menu.Add(Enum.GetName(type, value),
+                    () =>
+                    {
+                        choice = (TEnum)value; 
+                        return Task.CompletedTask;
+                    });
             menu.Display();
 
             return choice;

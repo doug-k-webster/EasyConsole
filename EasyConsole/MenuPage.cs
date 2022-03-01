@@ -4,23 +4,28 @@
     {
         protected Menu Menu { get; set; }
 
-        public MenuPage(string title, Program program, params Option[] options)
+        protected MenuPage(string title, Program program, params Option[] options)
             : base(title, program)
         {
             Menu = new Menu();
 
             foreach (var option in options)
+            {
                 Menu.Add(option);
+            }
         }
 
-        public override void Display()
+        public override async Task Display()
         {
-            base.Display();
+            await base.Display();
 
-            if (Program.NavigationEnabled && !Menu.Contains("Go back"))
-                Menu.Add("Go back", () => { Program.NavigateBack(); });
+            if (Program.NavigationEnabled
+                && !Menu.Contains("Go back"))
+            {
+                Menu.Add("Go back", async () => { await Program.NavigateBack(); });
+            }
 
-            Menu.Display();
+            await Menu.Display();
         }
     }
 }

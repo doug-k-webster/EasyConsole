@@ -1,21 +1,19 @@
-﻿using System;
+﻿namespace EasyConsole;
 
-namespace EasyConsole
+public class Option
 {
-    public class Option
+    public Option(string name, Func<Task> callback)
     {
-        public string Name { get; private set; }
-        public Action Callback { get; private set; }
+        Name = name;
+        Callback = callback;
+    }
 
-        public Option(string name, Action callback)
-        {
-            Name = name;
-            Callback = callback;
-        }
+    public string Name { get; private set; }
 
-        public override string ToString()
-        {
-            return Name;
-        }
+    public Func<Task> Callback { get; private set; }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }

@@ -1,30 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-
-namespace EasyConsole
+﻿namespace EasyConsole
 {
+    using System.Diagnostics;
+
     public abstract class Program
     {
-        protected string Title { get; set; }
-
-        public bool BreadcrumbHeader { get; private set; }
-
-        protected Page CurrentPage
-        {
-            get
-            {
-                return (History.Any()) ? History.Peek() : null;
-            }
-        }
-
-        private Dictionary<Type, Page> Pages { get; set; }
-
-        public Stack<Page> History { get; private set; }
-
-        public bool NavigationEnabled { get { return History.Count > 1; } }
-
         protected Program(string title, bool breadcrumbHeader)
         {
             Title = title;
@@ -33,13 +12,30 @@ namespace EasyConsole
             BreadcrumbHeader = breadcrumbHeader;
         }
 
-        public virtual void Run()
+        protected string Title { get; set; }
+
+        public bool BreadcrumbHeader { get; private set; }
+
+        protected Page? CurrentPage => this.History.Any() ? History.Peek() : null;
+
+        private Dictionary<Type, Page> Pages { get; set; }
+
+        public Stack<Page> History { get; private set; }
+
+        public bool NavigationEnabled => History.Count > 1;
+
+        public virtual async Task Run()
         {
             try
             {
                 Console.Title = Title;
 
-                CurrentPage.Display();
+                if (CurrentPage == null)
+                {
+                    throw new NullReferenceException("CurrentPage is null");
+                }
+
+                await CurrentPage.Display();
             }
             catch (Exception e)
             {
@@ -56,36 +52,47 @@ namespace EasyConsole
 
         public void AddPage(Page page)
         {
-            Type pageType = page.GetType();
+            var pageType = page.GetType();
 
             if (Pages.ContainsKey(pageType))
+            {
                 Pages[pageType] = page;
+            }
             else
+            {
                 Pages.Add(pageType, page);
+            }
         }
 
-        public void NavigateHome()
+        public async Task NavigateHome()
         {
             while (History.Count > 1)
+            {
                 History.Pop();
+            }
 
             Console.Clear();
-            CurrentPage.Display();
+            await CurrentPage.Display();
         }
 
-        public T SetPage<T>() where T : Page
+        public T SetPage<T>()
+            where T : Page
         {
-            Type pageType = typeof(T);
+            var pageType = typeof(T);
 
-            if (CurrentPage != null && CurrentPage.GetType() == pageType)
+            if (CurrentPage != null
+                && CurrentPage.GetType() == pageType)
+            {
                 return CurrentPage as T;
+            }
 
             // leave the current page
 
             // select the new page
-            Page nextPage;
-            if (!Pages.TryGetValue(pageType, out nextPage))
+            if (!Pages.TryGetValue(pageType, out var nextPage))
+            {
                 throw new KeyNotFoundException("The given page \"{0}\" was not present in the program".Format(pageType));
+            }
 
             // enter the new page
             History.Push(nextPage);
@@ -93,21 +100,22 @@ namespace EasyConsole
             return CurrentPage as T;
         }
 
-        public T NavigateTo<T>() where T : Page
+        public async Task<T> NavigateTo<T>()
+            where T : Page
         {
             SetPage<T>();
 
             Console.Clear();
-            CurrentPage.Display();
+            await CurrentPage.Display();
             return CurrentPage as T;
         }
 
-        public Page NavigateBack()
+        public async Task<Page> NavigateBack()
         {
             History.Pop();
 
             Console.Clear();
-            CurrentPage.Display();
+            await CurrentPage.Display();
             return CurrentPage;
         }
     }
