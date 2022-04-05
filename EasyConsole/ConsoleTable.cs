@@ -211,9 +211,9 @@ public class ConsoleTable<TData>
         {
             endingCharacter ??= this.BorderStyle[0];
             Console.ForegroundColor = this.BorderColor;
-            if (Console.CursorLeft < Console.BufferWidth - 1)
+            if (Console.CursorLeft < Console.BufferWidth - 2)
             {
-                int padCharCount = Console.BufferWidth - 1 - Console.CursorLeft;
+                int padCharCount = Console.BufferWidth - 2 - Console.CursorLeft;
                 Console.Write(new string(paddingCharacter, padCharCount));
             }
 
