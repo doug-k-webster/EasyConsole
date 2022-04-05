@@ -1,22 +1,21 @@
 ﻿using EasyConsole;
 
-namespace Demo.Pages
+namespace Demo.Pages;
+
+internal class Page2 : Page
 {
-    class Page2 : Page
+    public Page2(ConsoleProgram program)
+        : base("Page 2", program)
     {
-        public Page2(Program program)
-            : base("Page 2", program)
-        {
-        }
+    }
 
-        public override async Task Display()
-        {
-            await base.Display();
+    public override async Task Display(CancellationToken cancellationToken)
+    {
+        await base.Display(cancellationToken);
 
-            Output.WriteLine("Hello from Page 2");
+        Output.WriteLine("Hello from Page 2");
 
-            Input.ReadString("Press [Enter] to navigate home");
-            await Program.NavigateHome();
-        }
+        Input.ReadString("Press [Enter] to navigate home");
+        await this.Program.NavigateHome(cancellationToken);
     }
 }

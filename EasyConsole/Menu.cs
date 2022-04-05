@@ -1,45 +1,44 @@
-﻿namespace EasyConsole
+﻿namespace EasyConsole;
+
+public class Menu
 {
-    public class Menu
+    public Menu()
     {
-        public Menu()
+        this.Options = new List<Option>();
+    }
+
+    private IList<Option> Options { get; set; }
+
+    public async Task Display()
+    {
+        for (int i = 0; i < this.Options.Count; i++)
         {
-            Options = new List<Option>();
+            Console.WriteLine(
+                "{0}. {1}",
+                i + 1,
+                this.Options[i]
+                    .Name);
         }
 
-        private IList<Option> Options { get; set; }
+        int choice = Input.ReadInt("Choose an option:", min: 1, max: this.Options.Count);
 
-        public async Task Display()
-        {
-            for (int i = 0; i < Options.Count; i++)
-            {
-                Console.WriteLine(
-                    "{0}. {1}",
-                    i + 1,
-                    Options[i]
-                        .Name);
-            }
+        await this.Options[choice - 1]
+            .Callback();
+    }
 
-            int choice = Input.ReadInt("Choose an option:", min: 1, max: Options.Count);
+    public Menu Add(string option, Func<Task> callback)
+    {
+        return this.Add(new Option(option, callback));
+    }
 
-            await Options[choice - 1]
-                .Callback();
-        }
+    public Menu Add(Option option)
+    {
+        this.Options.Add(option);
+        return this;
+    }
 
-        public Menu Add(string option, Func<Task> callback)
-        {
-            return Add(new Option(option, callback));
-        }
-
-        public Menu Add(Option option)
-        {
-            Options.Add(option);
-            return this;
-        }
-
-        public bool Contains(string option)
-        {
-            return Options.FirstOrDefault((op) => op.Name.Equals(option)) != null;
-        }
+    public bool Contains(string option)
+    {
+        return this.Options.FirstOrDefault((op) => op.Name.Equals(option)) != null;
     }
 }

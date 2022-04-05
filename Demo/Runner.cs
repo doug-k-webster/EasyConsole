@@ -1,10 +1,21 @@
-﻿namespace Demo
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Demo;
+
+using Demo.Pages;
+
+using EasyConsole;
+
+internal class Runner
 {
-    class Runner
+    private static async Task Main(string[] args)
     {
-        private static async Task Main(string[] args)
-        {
-            await new DemoProgram().Run();
-        }
+        var host = new ConsoleProgramHost();
+        
+        await host.Execute<MainPage>("Demo App", args,
+            services =>
+            {
+                services.AddSingleton<ISampleService,SampleService>();
+            });
     }
 }
